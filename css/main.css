@@ -1,0 +1,18 @@
+.task:hover {
+    opacity: 0.5;
+    cursor: pointer;
+}
+
+.task__input:hover {
+    opacity: 0.5;
+}
+
+.filters div{
+    display: inline-block;
+
+    padding: 10px;
+}
+
+.filters div:hover {
+    cursor: pointer;
+}
