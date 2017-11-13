@@ -1,29 +1,6 @@
 var initHTML = document.querySelector('.toDoList');
 
 var MODULE = (function() {
-    var initData = [
-        {
-            id: 0,
-            renderId: 0,
-            title: 'first',
-            date: '2017-10-24 ',
-            state: true
-        },
-        {
-            id: 1,
-            renderId: 0,
-            title: 'second',
-            date: '2017-10-25 ',
-            state: false
-        },
-        {
-            id: 2,
-            renderId: 0,
-            title: 'third',
-            date: '2017-10-28 ',
-            state: false
-        }
-    ];
     var htmlTemplate = {
         wrap: 'section',
 
@@ -41,13 +18,12 @@ var MODULE = (function() {
 
     var toDoListRenderWrap = document.createElement('div');
 
-    function init(html) {
+    function init(html, initData) {
         var data =  JSON.parse(localStorage.getItem("toDoList")) || initData;
 
         var toDoListElem = document.createElement('section');
 
         var application = new App(html, data, toDoListElem);
-
 
         // Отрисовываем страницу
 
@@ -237,4 +213,4 @@ var MODULE = (function() {
 
 })();
 
-MODULE.init(initHTML);
+MODULE.init(initHTML, initData);
