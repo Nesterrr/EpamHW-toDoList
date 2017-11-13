@@ -36,8 +36,7 @@ var MODULE = (function() {
         '<input type="date" class="cal">' +
         '<button type=\"button\" class=\"task__add-button\">add</button>',
 
-        filters: '<div class="checkTask today">сегодня</div><div class="checkTask tomorrow">завтра</div><div class="checkTask week">неделя</div>'
-
+        filters: '<div class="checkTask today">сегодня</div><div class="checkTask tomorrow">завтра</div><div class="checkTask week">неделя</div><button type="button" class="checkTask removeFilter">X</button>'
     }
 
     var toDoListRenderWrap = document.createElement('div');
@@ -109,7 +108,9 @@ var MODULE = (function() {
 
         filters.className = 'filters';
         filters.innerHTML = htmlTemplate.filters;
+        if(filter) {
 
+        }
         toDoListRenderWrap.appendChild(filters);
 
         var addBtn = document.createElement('section');
@@ -191,39 +192,41 @@ var MODULE = (function() {
     }
     App.prototype.filters = function (target) {
 
-        var day = 60 * 60 * 12 * 1000;
+        const DAY = 60 * 60 * 12 * 1000;
 
-        var tomorrow = 60 * 60 * 48 * 1000;
+        const TOMORROW = 60 * 60 * 48 * 1000;
 
-        var week = 60 * 60 * 24 * 1000 * 7;
+        const WEEK = 60 * 60 * 24 * 1000 * 7;
 
-        var self = this;
+        const self = this;
 
         function getFiltered(time) {
-            var now =  Date.now();
-            return res = self.data.filter((item) => {
+            if(time === 0) {
+                return self.data;
+            } else {
+                var now = Date.now();
+                return res = self.data.filter((item) => {
 
-                var ms = Date.parse(item.date);
-                if(ms < now + time) { //&& ms > now) {
-                   return true;
-                }
-            });
+                    var ms = Date.parse(item.date);
+                    if (ms < now + time) { //&& ms > now) {
+                        return true;
+                    }
+                });
+            }
         }
-        function renderFilter(time) {
-             self.render(getFiltered(time));
-        }
+
         switch(target[1]) {
             case 'today':
-                console.log(1);
-                renderFilter(day);
+                self.render(getFiltered(DAY));
                 break;
             case 'tomorrow':
-                console.log(2);
-                renderFilter(tomorrow);
+                self.render(getFiltered(TOMORROW));
                 break;
             case 'week':
-                console.log(3);
-                renderFilter(week);
+                self.render(getFiltered(WEEK));
+                break;
+            case 'removeFilter':
+                self.render(getFiltered(0));
                 break;
         }
     }
