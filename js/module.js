@@ -81,25 +81,21 @@ var MODULE = (function() {
     App.prototype.createProxy = function () {
         var self = this;
         this.proxy = new Proxy(this.data, {
-            get(target, prop) {
-
-                self.render(this);
-
-                 localStorage.setItem('toDoList', JSON.stringify(self.data));
-
-                return target[prop];
-            },
             set(target, prop, value) {
                 target[prop] = value;
-                self.render(self.data);
+                self.render();
+
                 localStorage.setItem('toDoList', JSON.stringify(self.data));
+
                 return true;
             }
         });
         return this.proxy;
     }
 
-    App.prototype.render = function () {
+    App.prototype.render = function (filter) {
+        let dt = filter || this.data;
+
         this.initHtml.appendChild(toDoListRenderWrap);
 
         if(toDoListRenderWrap) {
@@ -124,7 +120,7 @@ var MODULE = (function() {
 
         // Создаем Node-таски из массива
 
-        this.data.forEach((item) => {
+        dt.forEach((item) => {
             item.renderId = i;
 
             var elem = document.createElement('section');
@@ -133,7 +129,7 @@ var MODULE = (function() {
             elem.innerHTML = this.templater(htmlTemplate.html)(item);
             toDoListRenderWrap.appendChild(elem);
             if(item.state === true) {
-                elem.children[0].checked = item.state;
+                elem.children[0].checked = 'checked';//item.state;
             }
             i++;
         });
@@ -155,7 +151,6 @@ var MODULE = (function() {
         this.initHtml.addEventListener('click', (event) => {
 
             var target = event.target;
-
             if(target.className === 'task__add-button') {
                 event.preventDefault();
 
@@ -175,7 +170,7 @@ var MODULE = (function() {
             }
         });
     }
-    
+
     App.prototype.add = function () {
         var input = document.querySelector('.task__input');
         var cal = document.querySelector('.cal');
@@ -196,30 +191,26 @@ var MODULE = (function() {
     }
     App.prototype.filters = function (target) {
 
-        var day = 60 * 60 * 24 * 1000;
+        var day = 60 * 60 * 12 * 1000;
 
-        var tomorrow = 60 * 60 * 60 * 24 * 1000 * 2;
+        var tomorrow = 60 * 60 * 48 * 1000;
 
-        var week = 60 * 60 * 60 * 24 * 1000 * 7;
+        var week = 60 * 60 * 24 * 1000 * 7;
 
         var self = this;
 
         function getFiltered(time) {
             var now =  Date.now();
-            return res = self.proxy.filter((item) => {
+            return res = self.data.filter((item) => {
 
                 var ms = Date.parse(item.date);
-                if(ms < now + time && ms > now) {
+                if(ms < now + time) { //&& ms > now) {
                    return true;
                 }
             });
         }
         function renderFilter(time) {
-            getFiltered(time);
-            self.proxy.splice(0, self.proxy.length);
-            res.forEach((item)=>{
-                self.proxy.push(item);
-            });
+             self.render(getFiltered(time));
         }
         switch(target[1]) {
             case 'today':
