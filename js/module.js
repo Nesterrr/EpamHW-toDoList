@@ -23,7 +23,14 @@ var MODULE = (function() {
 
         var toDoListElem = document.createElement('section');
 
-        var application = new App(html, data, toDoListElem);
+        var initParams = {
+            html: html,
+            data: data,
+            toDoListElem: toDoListElem,
+            proxy: {}
+        }
+
+        var application = new App(initParams);
 
         // Отрисовываем страницу
 
@@ -34,15 +41,17 @@ var MODULE = (function() {
 
         // Делигируем обработчик приложению
         application.eventListeners();
+
+        initParams.input = document.querySelector('.task__input');
+        initParams.cal = document.querySelector('.cal');
     }
 
-    var App = function App(initHtml, initData, toDoListElem, proxy) {
-        this.initHtml = initHtml;
-        this.data = initData;
-        this.toDoElem = toDoListElem;
-        this.proxy = proxy || {};
+    var App = function App(initParams) {
+        this.initHtml = initParams.html;
+        this.data = initParams.data;
+        this.toDoElem = initParams.toDoListElem;
+        this.proxy = initParams.proxy;
     }
-
     App.prototype.templater = function(html) {
         return function(items) {
             for (var x in items) {
@@ -84,9 +93,7 @@ var MODULE = (function() {
 
         filters.className = 'filters';
         filters.innerHTML = htmlTemplate.filters;
-        if(filter) {
 
-        }
         toDoListRenderWrap.appendChild(filters);
 
         var addBtn = document.createElement('section');
@@ -120,7 +127,7 @@ var MODULE = (function() {
         // Отрисовываем тудуЛист
 
         this.initHtml.appendChild(toDoListRenderWrap);
-
+        console.log('render');
         return this;
     }
 
@@ -130,7 +137,6 @@ var MODULE = (function() {
             var target = event.target;
             if(target.className === 'task__add-button') {
                 event.preventDefault();
-
                 this.add();
             }
             if(target.classList[0] === 'deleteTask') {
@@ -149,14 +155,14 @@ var MODULE = (function() {
     }
 
     App.prototype.add = function () {
-        var input = document.querySelector('.task__input');
-        var cal = document.querySelector('.cal');
+        const input = document.querySelector('.task__input');
+        const cal = document.querySelector('.cal');
 
         this.proxy.push({
                         id: this.data.length + 1,
                         title: input.value,
                         date: cal.value,
-                        state: false
+                        state: ''
                    });
     }
     
@@ -165,6 +171,8 @@ var MODULE = (function() {
     }
     App.prototype.setState = function (num) {
         this.proxy[num].state = !this.proxy[num].state;
+        localStorage.setItem('toDoList', JSON.stringify(this.data));
+        this.render();
     }
     App.prototype.filters = function (target) {
 
@@ -209,8 +217,6 @@ var MODULE = (function() {
     return  {
         init: init
     }
-
-
 })();
 
 MODULE.init(initHTML, initData);
